@@ -23,7 +23,7 @@ Here is the how KubePing can be integrated in your workflow:
 
 ## Installation
 ### Helm
-To configure and install the Helm chart, refer to the [values.yaml](./helm/values.yaml) file.
+To install the Helm chart, refer to the [values.yaml](./helm/values.yaml) file.
 
 ### Prometheus
 Configure the Prometheus job:
