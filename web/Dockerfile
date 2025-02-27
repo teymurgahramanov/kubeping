@@ -3,6 +3,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-EXPOSE 8000
+ENV GUNICORN_CMD_ARGS="--workers 2 --bind 0.0.0.0:8000 --log-level info"
 ENTRYPOINT ["gunicorn"] 
-CMD ["app:app", "-c", "gunicorn.conf.py"]
+CMD ["app:app"]

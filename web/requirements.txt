@@ -4,3 +4,4 @@ gunicorn==20.1.0
 Werkzeug==2.1.2
 kubernetes==30.1.0
 gevent==24.2.1
+dotenv==0.9.9

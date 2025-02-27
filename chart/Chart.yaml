@@ -1,6 +1,0 @@
-apiVersion: v2
-name: kubeping
-description: A Helm chart for KubePing
-type: application
-version: 0.1.0
-appVersion: "v1.0.0"

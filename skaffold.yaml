@@ -1,0 +1,41 @@
+---
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: kubeping
+
+build:
+  artifacts:
+  - image: kubeping-exporter
+    context: ./exporter
+    docker:
+      dockerfile: Dockerfile
+  - image: kubeping-web
+    context: ./web
+    docker:
+      dockerfile: Dockerfile
+
+deploy:
+  helm:
+    releases:
+    - name: kubeping
+      namespace: kubeping
+      createNamespace: true
+      chartPath: ./helm
+      setValueTemplates:
+        exporter.image.repository: "{{ .IMAGE_REPO_kubeping_exporter }}"
+        exporter.image.tag: "{{ .IMAGE_TAG_kubeping_exporter }}"
+        web.image.repository: "{{ .IMAGE_REPO_kubeping_web }}"
+        web.image.tag: "{{ .IMAGE_TAG_kubeping_web }}"
+      setValues:
+        exporter.config.exporter.defaultProbeTimeout: 33
+        web.ingress.enabled: true
+        web.ingress.className: "nginx"
+        web.ingress.host: "kubeping.local"
+      valuesFiles:
+        - values-dev.yaml
+profiles:
+  - name: docker-desktop
+    activation:
+      - kubeContext: docker-desktop
+        command: dev
