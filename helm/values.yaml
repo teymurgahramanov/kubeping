@@ -7,7 +7,7 @@ global:
 exporter:
   image:
     repository: teymurgahramanov/kubeping-exporter
-    tag: v1.0.0
+    tag: 1.0.0
   config: {}
 #    exporter:
 #      listenPort: 8000
@@ -43,7 +43,7 @@ exporter:
 web:
   image:
     repository: teymurgahramanov/kubeping-web
-    tag: v1.0.0
+    tag: 1.0.0
   service:
     type: ClusterIP
     nodePort: ""

@@ -5,6 +5,6 @@ load_dotenv()
 
 class Config:
 
-    APP_VERSION = 'v1.0.0'
+    APP_VERSION = '1.0.0'
     
 config = Config()
