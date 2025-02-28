@@ -1,8 +1,7 @@
-global:
-  nameOverride: ""
-  fullnameOverride: ""
-  imagePullSecrets: []
-  imagePullPolicy: IfNotPresent
+nameOverride: ""
+fullnameOverride: ""
+imagePullSecrets: []
+imagePullPolicy: IfNotPresent
 
 exporter:
   image:
