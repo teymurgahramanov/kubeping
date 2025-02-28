@@ -1,14 +1,9 @@
 # KubePing
 
-It is a ready-to-use solution for Kubernetes designed to monitor the availability of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ICMP and export Prometheus metrics.
+It is a Kubernetes solution designed to monitor the availability of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ICMP. It exports Prometheus metrics and has a user-friendly web interface that helps you save time instead of making telnet/curl on each node.
 
 <p align="center">
     <img src="kubeping-low.drawio.svg">
-</p>
-
-It also has a user-friendly web interface that helps you to save time instead of making telnet/curl on each node.
-<p align="center">
-    <img src="kubeping-web.gif">
 </p>
 
 ## Use case
@@ -19,6 +14,10 @@ This is just one scenario that highlights how KubePing can help you identify pot
 Here is the how KubePing can be integrated in your workflow:
 <p align="center">
     <img src="kubeping-high.drawio.svg">
+</p>
+
+<p align="center">
+    <img src="kubeping-web.gif" width="70%" height="70%">
 </p>
 
 ## Installation
