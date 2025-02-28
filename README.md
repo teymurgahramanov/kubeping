@@ -23,7 +23,33 @@ Here is the how KubePing can be integrated in your workflow:
 
 ## Installation
 ### Helm
-To install the Helm chart, refer to the [values.yaml](./helm/values.yaml) file.
+Refer to [values.yaml](./helm/values.yaml) file. Here is an example:
+```yaml
+# Configures Web UI
+web:
+  ingress:
+    enabled: true
+    host: "kubeping.local"
+
+# Configures Exporter
+exporter:
+  config:
+    exporter:
+      defaultProbeInterval: 31
+      defaultProbeTimeout: 13
+    targets:
+      target1:
+        address: api.example.com:8080
+        module: tcp
+        timeout: 15
+      target2:
+        address: https://example.com
+        module: http
+        interval: 60
+      target3:
+        address: 192.168.0.1
+        module: icmp
+```
 
 ### Prometheus
 Configure the Prometheus job:
