@@ -1,0 +1,65 @@
+nameOverride: ""
+fullnameOverride: ""
+imagePullSecrets: []
+imagePullPolicy: IfNotPresent
+
+exporter:
+  image:
+    repository: teymurgahramanov/kubeping-exporter
+    tag: 1.0.0
+  config: {}
+#    exporter:
+#      listenPort: 8000
+#      defaultProbeInterval: 15
+#      defaultProbeTimeout: 10
+#    targets:
+#      target1:
+#        address: api.example.com:8080
+#        module: tcp
+#        timeout: 15
+#      target2:
+#        address: https://example.com
+#        module: http
+#        interval: 60
+#      target3:
+#        address: 192.168.0.1
+#        module: icmp
+  service:
+    type: ClusterIP
+    nodePort: ""
+  daemonsetAnnotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  resources: {}
+  volumes: {}
+  volumeMounts: {}
+  podSecurityContext: {}
+  securityContext: {}
+
+web:
+  image:
+    repository: teymurgahramanov/kubeping-web
+    tag: 1.0.0
+  service:
+    type: ClusterIP
+    nodePort: ""
+  deploymentAnnotations: {}
+  ingress:
+    enabled: false
+    annotations: {}
+    className: ""
+    host: ""
+  env: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  resources: {}
+  volumes: {}
+  volumeMounts: {}
+  podSecurityContext: {}
+  securityContext: {}

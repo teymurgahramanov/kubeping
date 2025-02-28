@@ -1,0 +1,11 @@
+apiVersion: v2
+name: kubeping
+description: A Helm chart for KubePing
+type: application
+version: "1.0.0"
+appVersion: "1.0.0"
+sources:
+  - https://github.com/teymurgahramanov/kubeping
+maintainers:
+  - email: teymur_gahramanov@outlook.com
+    name: Teymur Gahramanov

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubeping.fullname" . }}-exporter
+  labels:
+    {{- include "kubeping.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.exporter.service.type }}
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+      {{- if eq .Values.exporter.service.type "NodePort" }}
+      nodePort: {{ .Values.exporter.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "kubeping-exporter.selectorLabels" . | nindent 4 }}
