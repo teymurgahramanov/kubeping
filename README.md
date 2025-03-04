@@ -16,6 +16,31 @@ Here is the how KubePing can be integrated in your workflow:
     <img src="kubeping-high.drawio.svg">
 </p>
 
+## How It Works
+### 1. Probing
+The solution runs a lightweight DaemonSet in Kubernetes, ensuring that each node has a running instance. These instances probe external endpoints over:
+
+__TCP__ – Checking port availability (e.g., database:5432, api:443)\
+__HTTP__ – Ensuring services respond with the expected status codes\
+__ICMP (Ping)__ – Verifying network reachability
+
+The results are aggregated and exposed as Prometheus metrics:
+```
+probe_result{address="api.example.com:8080", instance="worker-node-1", job="kubeping", module="tcp", target="target1"}=1
+probe_result{address="api.example.com:8080", instance="worker-node-2", job="kubeping", module="tcp", target="target1"}=0
+probe_result{address="api.example.com:8080", instance="worker-node-3", job="kubeping", module="tcp", target="target1"}=1
+
+probe_result{address="https://example.com", instance="worker-node-1", job="kubeping", module="http", target="target2"}=0
+probe_result{address="https://example.com", instance="worker-node-2", job="kubeping", module="http", target="target2"}=1
+probe_result{address="https://example.com", instance="worker-node-3", job="kubeping", module="http", target="target2"}=1
+
+probe_result{address="192.168.0.1", instance="worker-node-1", job="kubeping", module="icmp", target="target3"}=1
+probe_result{address="192.168.0.1", instance="worker-node-2", job="kubeping", module="icmp", target="target3"}=0
+probe_result{address="192.168.0.1", instance="worker-node-3", job="kubeping", module="icmp", target="target3"}=1
+```
+
+### 2. Web Interface for Faster Troubleshooting
+Instead of SSH-ing into nodes, you can simply visit the web UI, where you can perform connectivity test:
 <p align="center">
     <img src="kubeping-web.gif" width="70%" height="70%">
 </p>
