@@ -11,7 +11,7 @@ Imagine a situation where your pods were evicted because of a node failure. The 
 
 This is just one scenario that highlights how KubePing can help you identify potential issues before they escalate into major problems.
 
-Here is the how KubePing can be integrated in your workflow:
+Here is how KubePing can be integrated into your workflow:
 <p align="center">
     <img src="kubeping-high.drawio.svg">
 </p>
