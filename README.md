@@ -22,15 +22,20 @@ Here is the how KubePing can be integrated in your workflow:
 
 ## Installation
 ### Helm
-Refer to [values.yaml](./helm/values.yaml) file. Here is an example:
+Clone repository
+```
+git clone https://github.com/teymurgahramanov/kubeping.git && cd kubeping
+```
+Install Helm chart
+```
+helm upgrade --install kubeping ./helm
+```
+Test Web UI
+```
+kubectl port-forward svc/kubeping-web 8000:8000
+```
+To configure the exporter with static targets, refer to [values.yaml](./helm/values.yaml). Here is an example:
 ```yaml
-# Configures Web UI
-web:
-  ingress:
-    enabled: true
-    host: "kubeping.local"
-
-# Configures Exporter
 exporter:
   config:
     exporter:
@@ -51,9 +56,9 @@ exporter:
 ```
 
 ### Prometheus
-Configure the Prometheus job:
+Example job configuration:
 ```yaml
-- job_name: kubeping-exporter
+- job_name: kubeping
   kubernetes_sd_configs:
     - role: endpoints
   relabel_configs:
