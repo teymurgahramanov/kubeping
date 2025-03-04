@@ -7,6 +7,10 @@ It is a Kubernetes solution designed to monitor the availability of external end
 </p>
 
 ## Use case
+In Kubernetes environments, ensuring the accessibility of external endpoints is crucial. Whether it's databases, APIs, or third-party services, connectivity issues can lead to degraded application performance or outages. Traditionally, engineers troubleshoot these issues by manually running telnet, curl, or ping commands on individual nodes. However, this process is time-consuming and inefficient, especially in large-scale clusters.
+
+KubePing helps to solve these issues.
+
 Imagine a situation where your pods were evicted because of a node failure. The pods were then relocated to new nodes that had recently been added to the cluster. Unfortunately, this caused errors and resulted in service unavailability due to a lack of access to essential external endpoints. It was later discovered that the security department had failed to apply the appropriate access rules to the new cluster nodes.
 
 This is just one scenario that highlights how KubePing can help you identify potential issues before they escalate into major problems.
@@ -33,7 +37,7 @@ probe_result{address="192.168.0.1", instance="worker-node-2", job="kubeping", mo
 probe_result{address="192.168.0.1", instance="worker-node-3", job="kubeping", module="icmp", target="target3"}=1
 ```
 
-And instead of SSH-ing into nodes, you can simply visit the web UI, where you can test connectivity to any endpoint:
+And instead of SSH-ing into nodes, you can simply visit the web UI, where you can perform an ad-hoc connectivity test:
 <p align="center">
     <img src="kubeping-web.gif" width="70%" height="70%">
 </p>
