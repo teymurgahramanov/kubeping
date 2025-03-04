@@ -11,13 +11,7 @@ Imagine a situation where your pods were evicted because of a node failure. The 
 
 This is just one scenario that highlights how KubePing can help you identify potential issues before they escalate into major problems.
 
-Here is how KubePing can be integrated into your workflow:
-<p align="center">
-    <img src="kubeping-high.drawio.svg">
-</p>
-
 ## How It Works
-### 1. Probing
 The solution runs a lightweight DaemonSet in Kubernetes, ensuring that each node has a running instance. These instances probe external endpoints over:
 
 __TCP__ – Checking port availability (e.g., database:5432, api:443)\
@@ -39,10 +33,14 @@ probe_result{address="192.168.0.1", instance="worker-node-2", job="kubeping", mo
 probe_result{address="192.168.0.1", instance="worker-node-3", job="kubeping", module="icmp", target="target3"}=1
 ```
 
-### 2. Web Interface for Faster Troubleshooting
-Instead of SSH-ing into nodes, you can simply visit the web UI, where you can perform connectivity test:
+And instead of SSH-ing into nodes, you can simply visit the web UI, where you can test connectivity to any endpoint:
 <p align="center">
     <img src="kubeping-web.gif" width="70%" height="70%">
+</p>
+
+Here is how KubePing can be integrated into your workflow:
+<p align="center">
+    <img src="kubeping-high.drawio.svg">
 </p>
 
 ## Installation
