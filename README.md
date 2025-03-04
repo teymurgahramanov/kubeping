@@ -11,7 +11,7 @@ Imagine a situation where your pods were evicted because of a node failure. The 
 
 This is just one scenario that highlights how KubePing can help you identify potential issues before they escalate into major problems.
 
-Here is the how KubePing can be integrated in your workflow:
+Here is how KubePing can be integrated into your workflow:
 <p align="center">
     <img src="kubeping-high.drawio.svg">
 </p>
@@ -47,15 +47,20 @@ Instead of SSH-ing into nodes, you can simply visit the web UI, where you can pe
 
 ## Installation
 ### Helm
-Refer to [values.yaml](./helm/values.yaml) file. Here is an example:
+Clone repository
+```
+git clone https://github.com/teymurgahramanov/kubeping.git && cd kubeping
+```
+Install Helm chart
+```
+helm upgrade --install kubeping ./helm
+```
+Test Web UI
+```
+kubectl port-forward svc/kubeping-web 8000:8000
+```
+To configure the exporter with static targets, refer to [values.yaml](./helm/values.yaml). Here is an example:
 ```yaml
-# Configures Web UI
-web:
-  ingress:
-    enabled: true
-    host: "kubeping.local"
-
-# Configures Exporter
 exporter:
   config:
     exporter:
@@ -76,9 +81,9 @@ exporter:
 ```
 
 ### Prometheus
-Configure the Prometheus job:
+Example job configuration:
 ```yaml
-- job_name: kubeping-exporter
+- job_name: kubeping
   kubernetes_sd_configs:
     - role: endpoints
   relabel_configs:
