@@ -28,12 +28,37 @@ deploy:
         web.image.repository: "{{ .IMAGE_REPO_kubeping_web }}"
         web.image.tag: "{{ .IMAGE_TAG_kubeping_web }}"
       setValues:
-        exporter.config.exporter.defaultProbeTimeout: 33
-        web.ingress.enabled: true
-        web.ingress.className: "nginx"
-        web.ingress.host: "kubeping.local"
-      valuesFiles:
-        - values-dev.yaml
+        exporter.config.exporter.defaultProbeInterval: "31"
+        exporter.config.exporter.defaultProbeTimeout: "13"
+        exporter.config.targets.target1.address: "example.com:443"
+        exporter.config.targets.target1.module: "tcp"
+        exporter.config.targets.target1.timeout: "18"
+        exporter.config.targets.target2.address: "https://example.com"
+        exporter.config.targets.target2.module: "http"
+        exporter.config.targets.target2.interval: "12"
+        exporter.config.targets.target3.address: "example.com"
+        exporter.config.targets.target3.module: "icmp"
+        exporter.config.targets.target4.address: "api.example.com:8000"
+        exporter.config.targets.target4.module: "tcp"
+        exporter.config.targets.target4.timeout: "15"
+        exporter.config.targets.target5.address: "https://example.com/x/y/z"
+        exporter.config.targets.target5.module: "http"
+        exporter.config.targets.target5.interval: "60"
+        exporter.config.targets.target6.address: "192.168.168.168"
+        exporter.config.targets.target6.module: "icmp"
+
+portForward:
+- resourceType: deployment
+  resourceName: kubeping-web
+  namespace: kubeping
+  port: 8000
+  localPort: 9001
+- resourceType: daemonset
+  resourceName: kubeping-exporter
+  namespace: kubeping
+  port: 8000
+  localPort: 9002
+
 profiles:
   - name: docker-desktop
     activation:
