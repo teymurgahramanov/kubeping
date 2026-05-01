@@ -5,6 +5,9 @@ metadata:
   name: kubeping
 
 build:
+  tagPolicy:
+    inputDigest: {}
+  local: {}
   artifacts:
   - image: kubeping-exporter
     context: ./exporter
@@ -19,14 +22,18 @@ deploy:
   helm:
     releases:
     - name: kubeping
-      namespace: kubeping
+      namespace: kubeping-dev
       createNamespace: true
       chartPath: ./helm
       setValueTemplates:
         exporter.image.repository: "{{ .IMAGE_REPO_kubeping_exporter }}"
+        #exporter.image.repository: "registry:5000/kubeping-exporter"
         exporter.image.tag: "{{ .IMAGE_TAG_kubeping_exporter }}"
+        #exporter.image.tag: "screenshot-1"
         web.image.repository: "{{ .IMAGE_REPO_kubeping_web }}"
+        #web.image.repository: "registry:5000/kubeping-web"
         web.image.tag: "{{ .IMAGE_TAG_kubeping_web }}"
+        #web.image.tag: "screenshot-1"
       setValues:
         exporter.config.exporter.defaultProbeInterval: "31"
         exporter.config.exporter.defaultProbeTimeout: "13"
@@ -50,17 +57,17 @@ deploy:
 portForward:
 - resourceType: deployment
   resourceName: kubeping-web
-  namespace: kubeping
+  namespace: kubeping-dev
   port: 8000
   localPort: 9001
 - resourceType: daemonset
   resourceName: kubeping-exporter
-  namespace: kubeping
+  namespace: kubeping-dev
   port: 8000
   localPort: 9002
 
 profiles:
-  - name: docker-desktop
+  - name: local
     activation:
-      - kubeContext: docker-desktop
+      - kubeContext: kind
         command: dev

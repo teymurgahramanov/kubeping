@@ -13,6 +13,10 @@ spec:
   {{- with .Values.web.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
+  {{- with .Values.web.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   rules:
     - host: {{ .Values.web.ingress.host }}
       http:
@@ -23,5 +27,5 @@ spec:
               service:
                 name: {{ include "kubeping.fullname" $ }}-web
                 port:
-                  number: 8000
+                  number: {{ .Values.web.service.port | default 8000 }}
 {{- end }}

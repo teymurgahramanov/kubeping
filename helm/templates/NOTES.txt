@@ -1,0 +1,17 @@
+KubePing has been deployed.
+
+Web UI:
+{{- if .Values.web.ingress.enabled }}
+  http{{ if .Values.web.ingress.tls }}s{{ end }}://{{ .Values.web.ingress.host }}
+{{- else if eq .Values.web.service.type "NodePort" }}
+  export NODE_PORT=$(kubectl get svc {{ include "kubeping.fullname" . }}-web -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+  export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+  echo http://$NODE_IP:$NODE_PORT
+{{- else }}
+  kubectl port-forward svc/{{ include "kubeping.fullname" . }}-web -n {{ .Release.Namespace }} 8000:{{ .Values.web.service.port | default 8000 }}
+  Then open http://localhost:8000
+{{- end }}
+
+Exporter metrics:
+  kubectl port-forward svc/{{ include "kubeping.fullname" . }}-exporter -n {{ .Release.Namespace }} 8000:{{ .Values.exporter.service.port | default 8000 }}
+  Then open http://localhost:8000/metrics

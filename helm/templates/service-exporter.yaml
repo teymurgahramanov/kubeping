@@ -7,7 +7,7 @@ metadata:
 spec:
   type: {{ .Values.exporter.service.type }}
   ports:
-    - port: 8000
+    - port: {{ .Values.exporter.service.port | default 8000 }}
       targetPort: http
       protocol: TCP
       name: http

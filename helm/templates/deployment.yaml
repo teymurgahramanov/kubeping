@@ -9,7 +9,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.web.replicaCount | default 1 }}
   selector:
     matchLabels:
       {{- include "kubeping-web.selectorLabels" . | nindent 6 }}
@@ -36,7 +36,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "kubeping.fullname" . }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-web
           {{- with .Values.web.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
@@ -55,8 +55,10 @@ spec:
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.web.env }}
           env:
+            - name: SECRET_KEY
+              value: {{ .Values.web.secretKey | default "insecure-development-key-set-secret-key-env-in-production" | quote }}
+          {{- if and .Values.web.env (kindIs "slice" .Values.web.env) }}
             {{- toYaml .Values.web.env | nindent 12 }}
           {{- end }}
           {{- with .Values.web.resources }}
