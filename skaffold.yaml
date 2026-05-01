@@ -27,13 +27,9 @@ deploy:
       chartPath: ./helm
       setValueTemplates:
         exporter.image.repository: "{{ .IMAGE_REPO_kubeping_exporter }}"
-        #exporter.image.repository: "registry:5000/kubeping-exporter"
         exporter.image.tag: "{{ .IMAGE_TAG_kubeping_exporter }}"
-        #exporter.image.tag: "screenshot-1"
         web.image.repository: "{{ .IMAGE_REPO_kubeping_web }}"
-        #web.image.repository: "registry:5000/kubeping-web"
         web.image.tag: "{{ .IMAGE_TAG_kubeping_web }}"
-        #web.image.tag: "screenshot-1"
       setValues:
         exporter.config.exporter.defaultProbeInterval: "31"
         exporter.config.exporter.defaultProbeTimeout: "13"
