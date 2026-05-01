@@ -90,21 +90,19 @@ func main() {
 	var (
 		probeResult = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "probe_result",
-				Help: "Current status of the probe (1 for success, 0 for failure)",
+			Name: "kubeping_probe_result",
+			Help: "Current status of the probe (1 for success, 0 for failure)",
 			},
 			[]string{"target", "module", "address"},
 		)
 	)
 
 	promRegistry := prometheus.NewRegistry()
-	prometheus.DefaultRegisterer = promRegistry
-	prometheus.DefaultGatherer = promRegistry
-	prometheus.MustRegister(probeResult)
+	promRegistry.MustRegister(probeResult)
 
-	// HTTP handlers
-	http.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
-	http.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.HandlerFor(promRegistry, promhttp.HandlerOpts{}))
+	mux.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 			return
@@ -122,17 +120,19 @@ func main() {
 			timeout = config.Exporter.DefaultProbeTimeout
 		}
 
-		resultHandler := func(result bool, err error) {
+		resultHandler := func(result bool, probeErr error) {
 			var response probeResponse
 			response.Result = false
 			if result {
 				logger.Info("Probe successful")
 				response.Result = true
 			} else {
-				if err != nil {
-					logger.Error(fmt.Sprint(err.Error()))
+				if probeErr != nil {
+					logger.Error("probe failed", slog.String("err", probeErr.Error()))
+					response.Error = probeErr.Error()
+				} else {
+					response.Error = "probe failed"
 				}
-				response.Error = err.Error()
 			}
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
@@ -146,7 +146,7 @@ func main() {
 			result, err := modules.ProbeHTTP(request.Address, timeout)
 			resultHandler(result, err)
 		case "icmp":
-			result, err := modules.ProbeICMP(request.Address)
+			result, err := modules.ProbeICMP(request.Address, timeout)
 			resultHandler(result, err)
 		default:
 			logger.Error("Unknown module")
@@ -157,7 +157,7 @@ func main() {
 
 	// Start HTTP server
 	go func() {
-		err := http.ListenAndServe(fmt.Sprintf(":%d", config.Exporter.ListenPort), nil)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", config.Exporter.ListenPort), mux)
 		if err != nil {
 			logger.Error(fmt.Sprintf("Failed to start HTTP server: %v", err))
 			os.Exit(1)
@@ -209,7 +209,7 @@ func main() {
 				}
 			case "icmp":
 				for {
-					result, err := modules.ProbeICMP(address)
+					result, err := modules.ProbeICMP(address, timeout)
 					resultHandler(result, err, interval)
 				}
 			default:

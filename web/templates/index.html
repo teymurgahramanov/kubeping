@@ -4,85 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KubePing</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-network-wired"></i> KubePing</h1>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="topbar-left">
+                {% if public_ip %}
+                    <span class="ip-label">Public IP:</span>
+                    <span class="ip-value">{{ public_ip.ip }}</span>
+                {% endif %}
+            </div>
+            <div class="topbar-center">
+                <span class="logo"><span class="logo-kube">Kube</span><span class="logo-ping">Ping</span></span>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+                    <span class="icon-moon">&#9789;</span>
+                    <span class="icon-sun">&#9788;</span>
+                </button>
+            </div>
         </div>
-        
+    </header>
+
+    <div class="container">
         <div class="card">
-            <form action="/submit" method="post" id="pingForm">
+            <form action="/ping" method="post" id="pingForm">
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="address">
-                            <i class="fas fa-globe"></i> Address
-                        </label>
-                        <input type="text" id="address" name="address" placeholder="Host:Port" required>
+                    <div class="form-group address">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" placeholder="host:port" required>
                     </div>
-                    <div class="form-group">
-                        <label for="timeout">
-                            <i class="fas fa-clock"></i> Timeout
-                        </label>
+                    <div class="form-group timeout">
+                        <label for="timeout">Timeout</label>
                         <input type="number" id="timeout" name="timeout" placeholder="3" value="3" min="1" max="15">
                     </div>
-                </div>
-                <div class="form-submit">
                     <button type="submit" id="submitBtn">
-                        <span class="btn-content">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Ping</span>
-                        </span>
+                        <span class="btn-content">Ping</span>
                         <span class="btn-loading">
-                            <i class="fas fa-circle-notch fa-spin"></i>
-                            <span>Testing...</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation: spin 0.8s linear infinite;">
+                                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8" stroke-linecap="round"/>
+                            </svg>
+                            Wait…
                         </span>
                     </button>
                 </div>
             </form>
         </div>
-        
+
         {% if results %}
-        <div class="results-container">
-            <h2><i class="fas fa-list-check"></i> Results</h2>
-            <div class="results-grid">
-                {% for result in results %}
-                <div class="result-card {% if result.result == true %}success{% else %}error{% endif %}">
-                    <div class="result-header">
-                        <i class="fas fa-server"></i>
-                        <span class="host">{{ result.host }}</span>
-                    </div>
-                    <div class="result-content">
-                        {% if result.result == true %}
-                            <span class="success-icon">✅</span>
-                        {% else %}
-                            <span class="result-text">{{ result.result }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="results-section">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Host</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td class="col-num">{{ loop.index }}</td>
+                        <td class="col-host">{{ result.host }}</td>
+                        <td class="col-result">
+                            {% if result.result == true %}
+                                <span class="badge success">OK</span>
+                            {% else %}
+                                <span class="badge error">{{ result.result }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
         {% endif %}
     </div>
-    
+
     <footer class="footer">
-        <p>
-            <span class="version">Version: {{ version }}</span>
-            <span class="separator">|</span>
-            <a href="https://github.com/teymurgahramanov/kubeping" target="_blank">
-                <i class="fab fa-github"></i> GitHub
-            </a>
-        </p>
+        <div class="footer-inner">
+            <span>{{ version }}</span>
+            <a href="https://github.com/teymurgahramanov/kubeping" target="_blank">GitHub</a>
+        </div>
     </footer>
 
     <script>
-        document.getElementById('pingForm').addEventListener('submit', function() {
-            const btn = document.getElementById('submitBtn');
-            btn.classList.add('loading');
+        document.getElementById('pingForm').addEventListener('submit', function () {
+            document.getElementById('submitBtn').classList.add('loading');
         });
+
+        (function () {
+            const toggle = document.getElementById('themeToggle');
+            const stored = localStorage.getItem('theme');
+            if (stored) {
+                document.documentElement.setAttribute('data-theme', stored);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            toggle.addEventListener('click', function () {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        })();
     </script>
+
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>

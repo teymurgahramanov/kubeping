@@ -8,17 +8,17 @@ exporter:
     repository: teymurgahramanov/kubeping-exporter
     tag: 1.0.0
   config: {}
+# Example: replace `{}` with the following (indented as real YAML under config:).
 #    exporter:
-#      listenPort: 8000
-#      defaultProbeInterval: 15
-#      defaultProbeTimeout: 10
+#      defaultProbeInterval: 31
+#      defaultProbeTimeout: 13
 #    targets:
 #      target1:
-#        address: api.example.com:8080
+#        address: api.example.az:8080
 #        module: tcp
 #        timeout: 15
 #      target2:
-#        address: https://example.com
+#        address: https://example.az
 #        module: http
 #        interval: 60
 #      target3:
@@ -26,7 +26,20 @@ exporter:
 #        module: icmp
   service:
     type: ClusterIP
-    nodePort: ""
+    port: 8000
+    nodePort: null
+  livenessProbe:
+    httpGet:
+      path: /metrics
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  readinessProbe:
+    httpGet:
+      path: /metrics
+      port: http
+    initialDelaySeconds: 3
+    periodSeconds: 10
   daemonsetAnnotations: {}
   podLabels: {}
   podAnnotations: {}
@@ -34,32 +47,58 @@ exporter:
   affinity: {}
   tolerations: []
   resources: {}
-  volumes: {}
-  volumeMounts: {}
+  volumes: []
+  volumeMounts: []
   podSecurityContext: {}
-  securityContext: {}
+  # ICMP probes need raw sockets (pro-bing). Override with {} only if you disable icmp targets.
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+      add:
+        - NET_RAW
 
 web:
+  replicaCount: 1
   image:
     repository: teymurgahramanov/kubeping-web
     tag: 1.0.0
   service:
     type: ClusterIP
-    nodePort: ""
+    port: 8000
+    nodePort: null
   deploymentAnnotations: {}
   ingress:
     enabled: false
     annotations: {}
     className: ""
     host: ""
-  env: {}
+    tls: []
+    #  - secretName: kubeping-tls
+    #    hosts:
+    #      - kubeping.example.com
+  # Flask session signing; override in production (e.g. helm --set web.secretKey=...).
+  secretKey: ""
+  env: []
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+    initialDelaySeconds: 3
+    periodSeconds: 10
   podLabels: {}
   podAnnotations: {}
   nodeSelector: {}
   affinity: {}
   tolerations: []
   resources: {}
-  volumes: {}
-  volumeMounts: {}
+  volumes: []
+  volumeMounts: []
   podSecurityContext: {}
   securityContext: {}

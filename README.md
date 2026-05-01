@@ -1,98 +1,64 @@
 # KubePing
 
-It is a Kubernetes solution designed to monitor the availability of external endpoints from each node of the Kubernetes cluster over TCP, HTTP, and ICMP. It exports Prometheus metrics and has a user-friendly web interface that helps you save time instead of making telnet/curl on each node.
+A solution designed to monitor the availability of external endpoints from each node in a Kubernetes cluster over TCP, HTTP, and ICMP in real time. It exports Prometheus metrics and provides a user-friendly web interface, eliminating the need for manual checks on individual nodes.
 
 <p align="center">
     <img src="kubeping-low.drawio.svg">
 </p>
 
 ## Use case
-In Kubernetes environments, ensuring the accessibility of external endpoints is crucial. Whether it's databases, APIs, or third-party services, connectivity issues can lead to degraded application performance or outages. Traditionally, engineers troubleshoot these issues by manually running telnet, curl, or ping commands on individual nodes. However, this process is time-consuming and inefficient, especially in large-scale clusters.
+In Kubernetes environments, ensuring reliable access to external endpoints is critical. Dependencies such as databases, APIs, and third-party services can become single points of failure, and connectivity issues often result in degraded performance or outages.
 
-__KubePing__ helps to solve these issues🎉
+Troubleshooting is typically done by manually running tools like telnet, curl, or ping on individual nodes. This approach is slow, repetitive, and does not scale well, even when partially automated, especially in large clusters.
 
-Imagine a situation where your pods were evicted because of a node failure. The pods were then relocated to new nodes that had recently been added to the cluster. Unfortunately, this caused errors and resulted in service unavailability due to a lack of access to essential external endpoints. It was later discovered that the security department had failed to apply the appropriate access rules to the new cluster nodes.
-
-This is just one scenario that highlights how KubePing can help you identify potential issues before they escalate into major problems.
+__KubePing__ solves this problem.
 
 ## How It Works
-The solution runs a lightweight DaemonSet in Kubernetes, ensuring that each node has a running instance. These instances probe external endpoints over:
+The solution runs a lightweight DaemonSet in Kubernetes, ensuring an exporter instance on every node. Each instance probes external endpoints via:
 
-__TCP__ – Checking port availability (e.g., database:5432, api:443)\
-__HTTP__ – Ensuring services respond with the expected status codes\
-__ICMP (Ping)__ – Verifying network reachability
+__TCP__ Checking port availability (e.g., database:5432, api:443)\
+__HTTP__ Ensuring services respond with the expected status codes\
+__ICMP (Ping)__ Verifying network reachability
 
-The results are aggregated and exposed as Prometheus metrics:
-```
-probe_result{address="api.example.com:8080", instance="worker-node-1", job="kubeping", module="tcp", target="target1"}=1
-probe_result{address="api.example.com:8080", instance="worker-node-2", job="kubeping", module="tcp", target="target1"}=0
-probe_result{address="api.example.com:8080", instance="worker-node-3", job="kubeping", module="tcp", target="target1"}=1
-
-probe_result{address="https://example.com", instance="worker-node-1", job="kubeping", module="http", target="target2"}=0
-probe_result{address="https://example.com", instance="worker-node-2", job="kubeping", module="http", target="target2"}=1
-probe_result{address="https://example.com", instance="worker-node-3", job="kubeping", module="http", target="target2"}=1
-
-probe_result{address="192.168.0.1", instance="worker-node-1", job="kubeping", module="icmp", target="target3"}=1
-probe_result{address="192.168.0.1", instance="worker-node-2", job="kubeping", module="icmp", target="target3"}=0
-probe_result{address="192.168.0.1", instance="worker-node-3", job="kubeping", module="icmp", target="target3"}=1
-```
-
-And instead of SSH-ing into nodes, you can simply visit the web UI, where you can perform an ad-hoc connectivity test:
-<p align="center">
-    <img src="kubeping-web.gif" width="70%" height="70%">
-</p>
-
-Here is how KubePing can be integrated into your workflow:
 <p align="center">
     <img src="kubeping-high.drawio.svg">
 </p>
 
-## Installation
-### Helm
-Clone repository
+The results are aggregated and exposed as Prometheus metrics:
 ```
-git clone https://github.com/teymurgahramanov/kubeping.git && cd kubeping
+kubeping_probe_result{address="api.example.az:8080", instance="worker-node-1", job="kubeping", module="tcp", target="target1"}=1
+kubeping_probe_result{address="api.example.az:8080", instance="worker-node-2", job="kubeping", module="tcp", target="target1"}=0
+kubeping_probe_result{address="api.example.az:8080", instance="worker-node-3", job="kubeping", module="tcp", target="target1"}=1
+
+kubeping_probe_result{address="https://example.az", instance="worker-node-1", job="kubeping", module="http", target="target2"}=0
+kubeping_probe_result{address="https://example.az", instance="worker-node-2", job="kubeping", module="http", target="target2"}=1
+kubeping_probe_result{address="https://example.az", instance="worker-node-3", job="kubeping", module="http", target="target2"}=1
+
+kubeping_probe_result{address="192.168.0.1", instance="worker-node-1", job="kubeping", module="icmp", target="target3"}=1
+kubeping_probe_result{address="192.168.0.1", instance="worker-node-2", job="kubeping", module="icmp", target="target3"}=0
+kubeping_probe_result{address="192.168.0.1", instance="worker-node-3", job="kubeping", module="icmp", target="target3"}=1
+```
+
+## Instant checks
+
+Use the web UI to run ad-hoc connectivity tests across all nodes at once
+<p align="center">
+    <img src="kubeping-web.gif" width="70%" height="70%">
+</p>
+
+## How to install
+Add Helm repository
+```
+helm repo add teymurgahramanov https://teymurgahramanov.github.io/charts && helm repo update teymurgahramanov
 ```
 Install Helm chart
 ```
-helm upgrade --install kubeping ./helm
+helm upgrade --install kubeping teymurgahramanov/kubeping \
+--namespace kubeping \
+--create-namespace
 ```
-Test Web UI
+Access Web UI on http://localhost:8000
 ```
-kubectl port-forward svc/kubeping-web 8000:8000
+kubectl -n kubeping port-forward svc/kubeping-web 8000:8000
 ```
-To configure the exporter with static targets, refer to [values.yaml](./helm/values.yaml). Here is an example:
-```yaml
-exporter:
-  config:
-    exporter:
-      defaultProbeInterval: 31
-      defaultProbeTimeout: 13
-    targets:
-      target1:
-        address: api.example.com:8080
-        module: tcp
-        timeout: 15
-      target2:
-        address: https://example.com
-        module: http
-        interval: 60
-      target3:
-        address: 192.168.0.1
-        module: icmp
-```
-
-### Prometheus
-Example job configuration:
-```yaml
-- job_name: kubeping
-  kubernetes_sd_configs:
-    - role: endpoints
-  relabel_configs:
-    - source_labels: [__meta_kubernetes_endpoints_name]
-      regex: kubeping-exporter
-      action: keep
-    - source_labels: [__meta_kubernetes_endpoint_node_name]
-      action: replace
-      target_label: instance
-```
+To configure the exporter with static targets, see the example under `exporter.config` in [values.yaml](./helm/values.yaml).

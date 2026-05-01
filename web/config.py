@@ -5,6 +5,7 @@ load_dotenv()
 
 class Config:
 
-    APP_VERSION = '1.0.0'
+    APP_VERSION = '1.1.0'
+    PUBLIC_IP_URL = os.environ.get('PUBLIC_IP_URL', 'https://ifconfig.me/ip')
     
 config = Config()

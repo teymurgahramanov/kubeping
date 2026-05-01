@@ -14,10 +14,11 @@ spec:
       {{- include "kubeping-exporter.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.exporter.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.exporter.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "kubeping.labels" . | nindent 8 }}
         {{- include "kubeping-exporter.selectorLabels" . | nindent 8 }}
@@ -34,7 +35,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-exporter
           {{- with .Values.exporter.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}

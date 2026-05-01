@@ -1,4 +1,4 @@
-name: Release
+name: Create release
 
 on:
   workflow_dispatch:
@@ -8,17 +8,45 @@ on:
         description: Release name
         required: true
 
+env:
+  IMAGE_NAME: ${{ github.repository }}
+  HELM_REPO_NAME: charts
+  HELM_REPO_OWNER: ${{ secrets.HELM_REPO_OWNER }}
+  HELM_REPO_TOKEN: ${{ secrets.HELM_REPO_TOKEN }}
+  RELEASE_NAME: ${{ github.event.inputs.release-name }}
+
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
 
     steps:
-      - uses: actions/checkout@v3
-
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Update version and bump
+        run: |
+          APP_VERSION="${{ env.RELEASE_NAME }}"
+          CONFIG_FILE="web/config.py"
+          CHART_FILE="helm/Chart.yaml"
+
+          echo "Updating $CONFIG_FILE with APP_VERSION=$APP_VERSION"
+          sed -i "s/^    APP_VERSION: str = \".*\"/    APP_VERSION: str = \"$APP_VERSION\"/" $CONFIG_FILE
+          
+          echo "Updating $CHART_FILE with appVersion=$APP_VERSION"
+          sed -i "s/^appVersion:.*/appVersion: \"$APP_VERSION\"/" $CHART_FILE
+          sed -i "s/^version:.*/version: \"$APP_VERSION\"/" $CHART_FILE
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add $CONFIG_FILE $CHART_FILE
+          git commit -m "🔖 Bump version to $RELEASE_NAME" || echo "No changes to commit"
+          git push
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -26,33 +54,50 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push exporter
-        uses: docker/build-push-action@v5
-        with:
-          context: ./exporter
-          file: ./exporter/Dockerfile
-          push: true
-          tags: ${{ github.repository }}-exporter:${{ inputs.release-name }}, ${{ github.repository }}-exporter:latest
-
-      - name: Build and push web
+      - name: Build and push Web image
         uses: docker/build-push-action@v5
         with:
           context: ./web
           file: ./web/Dockerfile
           push: true
-          tags: ${{ github.repository }}-web:${{ inputs.release-name }}, ${{ github.repository }}-web:latest
-  
-      - name: Package Helm chart
+          tags: ${{ env.IMAGE_NAME }}-web:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_NAME }}-web:latest
+
+      - name: Build and push Exporter image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./exporter
+          file: ./exporter/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}-exporter:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_NAME }}-exporter:latest
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.0
+
+      - name: Package and push Helm chart
         run: |
-          helm package ./helm --destination ./helm-packaged
+          mkdir -p packaged
+          helm dependency update helm/
+          helm package helm/ --destination packaged
+          REPO_NAME=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
+          git clone -b gh-pages --depth 1 https://${{ env.HELM_REPO_OWNER }}:${{ env.HELM_REPO_TOKEN }}@github.com/${{ env.HELM_REPO_OWNER }}/${{ env.HELM_REPO_NAME }}.git helm-charts
+          mv -f packaged/*.tgz helm-charts/
+          cd helm-charts
+          helm repo index . --url https://${{ env.HELM_REPO_OWNER }}.github.io/${{ env.HELM_REPO_NAME }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "🆕 Publish $REPO_NAME ${{ env.RELEASE_NAME }}"
+          git push
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           name: ${{ inputs.release-name }}
           tag: ${{ inputs.release-name }}
-          bodyFile: "CHANGELOG.md"
-          artifacts: "./helm-packaged/*.tgz"
+          bodyFile: RELEASE.md
           allowUpdates: true
           artifactErrorsFailBuild: true
           makeLatest: true
+          draft: ${{ github.ref_name != 'main' }}
