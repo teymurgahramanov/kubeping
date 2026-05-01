@@ -95,3 +95,4 @@ jobs:
           allowUpdates: true
           artifactErrorsFailBuild: true
           makeLatest: true
+          draft: ${{ github.ref_name != 'main' }}
