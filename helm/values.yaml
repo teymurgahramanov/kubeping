@@ -6,7 +6,7 @@ imagePullPolicy: IfNotPresent
 exporter:
   image:
     repository: teymurgahramanov/kubeping-exporter
-    tag: 1.0.0
+    tag: 1.1.0
   config: {}
 # Example: replace `{}` with the following (indented as real YAML under config:).
 #    exporter:
@@ -62,7 +62,7 @@ web:
   replicaCount: 1
   image:
     repository: teymurgahramanov/kubeping-web
-    tag: 1.0.0
+    tag: 1.1.0
   service:
     type: ClusterIP
     port: 8000

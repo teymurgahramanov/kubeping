@@ -65,5 +65,5 @@ portForward:
 profiles:
   - name: local
     activation:
-      - kubeContext: kind
+      - kubeContext: local
         command: dev
