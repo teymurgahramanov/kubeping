@@ -6,7 +6,7 @@ imagePullPolicy: IfNotPresent
 exporter:
   image:
     repository: teymurgahramanov/kubeping-exporter
-    tag: 1.1.0
+    tag: ""
   config: {}
 # Example: replace `{}` with the following (indented as real YAML under config:).
 #    exporter:
@@ -62,7 +62,7 @@ web:
   replicaCount: 1
   image:
     repository: teymurgahramanov/kubeping-web
-    tag: 1.1.0
+    tag: ""
   service:
     type: ClusterIP
     port: 8000
@@ -73,10 +73,9 @@ web:
     annotations: {}
     className: ""
     host: ""
-    tls: []
-    #  - secretName: kubeping-tls
-    #    hosts:
-    #      - kubeping.example.com
+    tls:
+      enabled: false
+      secretName: ""
   # Flask session signing; override in production (e.g. helm --set web.secretKey=...).
   secretKey: ""
   env: []

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [1.1.1] - 2026-06-27
+
+### Changed
+- Helm image tag defaults are now empty in `values.yaml`, so web and exporter images use the chart `appVersion` unless explicitly overridden
+- Helm ingress TLS configuration now uses `web.ingress.host` as the single source for both ingress rules and TLS hosts
+- Helm ingress TLS values now use `web.ingress.tls.enabled` and `web.ingress.tls.secretName`
+
 ## [1.1.0]
 
 ### Added

@@ -13,9 +13,13 @@ spec:
   {{- with .Values.web.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- with .Values.web.ingress.tls }}
+  {{- if .Values.web.ingress.tls.enabled }}
   tls:
-    {{- toYaml . | nindent 4 }}
+    - hosts:
+        - {{ .Values.web.ingress.host | quote }}
+      {{- with .Values.web.ingress.tls.secretName }}
+      secretName: {{ . | quote }}
+      {{- end }}
   {{- end }}
   rules:
     - host: {{ .Values.web.ingress.host }}
