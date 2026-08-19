@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.2.0]
+
+### Added
+- HTTP and ICMP probe modules selectable in the web UI alongside TCP
+- Module selector dropdown in the probe form
+- Requested target displayed as the heading of the results table
+
+### Changed
+- Address input hint now updates dynamically based on the selected module
+- Web `/ping` endpoint reads the module from the form instead of hardcoding TCP
+
 ## [1.1.1] - 2026-06-27
 
 ### Changed
