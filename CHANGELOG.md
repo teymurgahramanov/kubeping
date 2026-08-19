@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [1.2.1]
+
+### Changed
+- HTTP probe now verifies TLS certificates instead of skipping validation, surfacing all SSL/TLS errors (expired, hostname mismatch, untrusted CA, handshake failures) with their original error messages
+
 ## [1.2.0]
 
 ### Added
