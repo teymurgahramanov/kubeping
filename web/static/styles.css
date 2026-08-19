@@ -105,6 +105,15 @@ body {
   color: var(--text-dim);
 }
 
+.app-version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  opacity: 0.6;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .ip-value {
   font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
   font-size: 0.85rem;

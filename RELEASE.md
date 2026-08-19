@@ -1,5 +1,5 @@
-# KubePing 1.2.1
+# KubePing 1.2.2
 
-KubePing 1.2.1 makes the HTTP probe sensitive to SSL/TLS certificate errors.
+KubePing 1.2.2 relocates the app version display and fixes the release workflow version bumping.
 
-The HTTP probe previously skipped TLS certificate verification (`InsecureSkipVerify`), so certificate problems were never reported. Verification is now enabled, and all SSL/TLS errors — expired certificates, hostname mismatches, untrusted or unknown certificate authorities, and handshake failures — are surfaced with their original Go TLS error messages.
+The app version is now shown in the header next to the KubePing logo instead of the footer.

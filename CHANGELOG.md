@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.2.2]
+
+### Changed
+- App version moved from the footer to the header, displayed next to the KubePing logo
+
+### Fixed
+- Release workflow now correctly bumps `APP_VERSION` in `config.py` (sed pattern updated to match the actual file format)
+
 ## [1.2.1]
 
 ### Changed
