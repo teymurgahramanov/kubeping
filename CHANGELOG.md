@@ -11,6 +11,7 @@
 - Unit tests for the `/probe` HTTP handler (method validation, JSON decoding, module routing, timeout fallback, success/failure responses)
 
 ### Changed
+- Upgraded exporter to Go 1.27.0 (from 1.21.6)
 - Web and exporter container images are now published to the `kubeping` Docker Hub namespace (`kubeping/kubeping-web`, `kubeping/kubeping-exporter`) instead of the per-user `github.repository` namespace
 - Address input hint now updates dynamically based on the selected module
 - Web `/ping` endpoint reads the module from the form instead of hardcoding TCP
