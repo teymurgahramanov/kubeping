@@ -10,7 +10,7 @@ import (
 // ProbeHTTP is for probe HTTP endpoints
 func ProbeHTTP(address string, timeout int) (bool, error) {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{},
 	}
 	client := &http.Client{
 		Transport: tr,

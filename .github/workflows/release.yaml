@@ -36,7 +36,7 @@ jobs:
           CHART_FILE="helm/Chart.yaml"
 
           echo "Updating $CONFIG_FILE with APP_VERSION=$APP_VERSION"
-          sed -i "s/^    APP_VERSION: str = \".*\"/    APP_VERSION: str = \"$APP_VERSION\"/" $CONFIG_FILE
+          sed -i "s/^    APP_VERSION = '.*'/    APP_VERSION = '$APP_VERSION'/" $CONFIG_FILE
           
           echo "Updating $CHART_FILE with appVersion=$APP_VERSION"
           sed -i "s/^appVersion:.*/appVersion: \"$APP_VERSION\"/" $CHART_FILE

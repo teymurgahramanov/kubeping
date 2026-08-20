@@ -7,7 +7,9 @@ metadata:
 build:
   tagPolicy:
     inputDigest: {}
-  local: {}
+  local:
+    push: false
+    useDockerCLI: true
   artifacts:
   - image: kubeping-exporter
     context: ./exporter
