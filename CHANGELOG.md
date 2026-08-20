@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [1.2.0]
+
+### Added
+- HTTP and ICMP probe modules selectable in the web UI alongside TCP
+- CA certificates bundled into the exporter image so HTTPS probes validate against trusted roots (e.g. Let's Encrypt / ISRG Root X1)
+- Module selector dropdown in the probe form
+- Requested target displayed as the heading of the results table
+
+### Changed
+- Web and exporter container images are now published to the `kubeping` Docker Hub namespace (`kubeping/kubeping-web`, `kubeping/kubeping-exporter`) instead of the per-user `github.repository` namespace
+- Address input hint now updates dynamically based on the selected module
+- Web `/ping` endpoint reads the module from the form instead of hardcoding TCP
+- HTTP probe now verifies TLS certificates instead of skipping validation, surfacing all SSL/TLS errors (expired, hostname mismatch, untrusted CA, handshake failures) with their original error messages
+- App version moved from the footer to the header, displayed next to the KubePing logo
+- Removed line dividers from the header and footer
+- Removed bold styling from the target heading above the results table
+
+### Fixed
+- Release workflow now correctly bumps `APP_VERSION` in `config.py` (sed pattern updated to match the actual file format)
+
 ## [1.1.1] - 2026-06-27
 
 ### Changed

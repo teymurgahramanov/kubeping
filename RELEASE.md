@@ -1,11 +1,9 @@
-# KubePing 1.1.1
+# KubePing 1.2.0
 
-Released: 2026-06-27
+KubePing 1.2.0 adds HTTP and ICMP probe modules selectable in the web UI alongside TCP, with a module selector dropdown and a dynamically updating address input hint. The requested target is displayed as the heading of the results table.
 
-KubePing 1.1.1 refines the Helm chart defaults for easier version management and simpler ingress TLS configuration.
+The HTTP probe now verifies TLS certificates instead of skipping validation, surfacing all SSL/TLS errors (expired, hostname mismatch, untrusted CA, handshake failures) with their original error messages.
 
-Image tags in `values.yaml` are now empty by default. When no explicit tag is provided, the Helm templates use the chart `appVersion` for both the web and exporter images.
+The app version is now shown in the header next to the KubePing logo instead of the footer. The header and footer line dividers have been removed, and the bold styling on the target heading above the results table has been removed.
 
-Ingress TLS now uses `web.ingress.host` as the single host source. Enable TLS with `web.ingress.tls.enabled` and set the certificate secret with `web.ingress.tls.secretName`.
-
-Upgrade note: if you previously configured `web.ingress.tls` as a list with its own `hosts`, move the host value to `web.ingress.host` and configure TLS with the new `enabled` and `secretName` fields.
+This release also fixes the release workflow to correctly bump `APP_VERSION` in `config.py`.

@@ -57,9 +57,8 @@ body {
 /* Top bar */
 .topbar {
   background: var(--topbar-bg);
-  border-bottom: 1px solid var(--border);
   padding: 0.5rem 1.5rem;
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s;
 }
 
 .topbar-inner {
@@ -293,7 +292,7 @@ button[type="submit"].loading .btn-loading {
   align-items: center;
   gap: 0.6rem;
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--text);
   text-transform: lowercase;
   letter-spacing: 0;
@@ -304,7 +303,7 @@ button[type="submit"].loading .btn-loading {
 .results-target-address {
   font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .results-table {
@@ -389,8 +388,6 @@ button[type="submit"].loading .btn-loading {
   padding: 1.5rem;
   font-size: 0.8rem;
   color: var(--text-dim);
-  border-top: 1px solid var(--border);
-  transition: border-color 0.3s;
 }
 
 .footer a {
