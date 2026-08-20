@@ -41,7 +41,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag | default (printf "web-%s" .Chart.AppVersion) }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - name: http

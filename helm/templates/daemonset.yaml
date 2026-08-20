@@ -40,7 +40,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag | default (printf "exporter-%s" .Chart.AppVersion) }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - name: http
