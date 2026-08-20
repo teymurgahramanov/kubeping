@@ -1,4 +1,4 @@
-FROM golang:1.21.6 AS build
+FROM golang:1.27.0 AS build
 WORKDIR /app
 COPY . .
 RUN \
@@ -9,7 +9,7 @@ RUN \
 FROM alpine:3.19 AS certs
 RUN apk --no-cache add ca-certificates
 
-FROM scratch as final
+FROM scratch AS final
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 COPY --from=build /app/bin/kubeping-exporter /

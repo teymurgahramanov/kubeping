@@ -7,6 +7,8 @@
 - CA certificates bundled into the exporter image so HTTPS probes validate against trusted roots (e.g. Let's Encrypt / ISRG Root X1)
 - Module selector dropdown in the probe form
 - Requested target displayed as the heading of the results table
+- Unit tests for the TCP, HTTP, and ICMP probe modules
+- Unit tests for the `/probe` HTTP handler (method validation, JSON decoding, module routing, timeout fallback, success/failure responses)
 
 ### Changed
 - Web and exporter container images are now published to the `kubeping` Docker Hub namespace (`kubeping/kubeping-web`, `kubeping/kubeping-exporter`) instead of the per-user `github.repository` namespace

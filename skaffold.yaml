@@ -51,6 +51,10 @@ deploy:
         exporter.config.targets.target5.interval: "60"
         exporter.config.targets.target6.address: "192.168.168.168"
         exporter.config.targets.target6.module: "icmp"
+        exporter.config.targets.target7.address: "https://self-signed.badssl.com"
+        exporter.config.targets.target7.module: "http"
+        exporter.config.targets.target7.interval: "30"
+        exporter.config.targets.target7.insecureTls: "true"
 
 portForward:
 - resourceType: deployment
