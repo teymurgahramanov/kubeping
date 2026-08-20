@@ -1,11 +1,10 @@
-# KubePing 1.1.1
+# KubePing 1.2.0
 
-Released: 2026-06-27
-
-KubePing 1.1.1 refines the Helm chart defaults for easier version management and simpler ingress TLS configuration.
-
-Image tags in `values.yaml` are now empty by default. When no explicit tag is provided, the Helm templates use the chart `appVersion` for both the web and exporter images.
-
-Ingress TLS now uses `web.ingress.host` as the single host source. Enable TLS with `web.ingress.tls.enabled` and set the certificate secret with `web.ingress.tls.secretName`.
-
-Upgrade note: if you previously configured `web.ingress.tls` as a list with its own `hosts`, move the host value to `web.ingress.host` and configure TLS with the new `enabled` and `secretName` fields.
+- 📡 **HTTP and ICMP probes:** Added HTTP and ICMP modules alongside TCP, selectable from a new module dropdown in the web UI.
+- 🎯 **Target visibility:** The requested target is displayed as the results table heading.
+- 🔐 **TLS validation:** HTTP probes now verify certificates and surface original SSL/TLS errors, including expired certificates, hostname mismatches, untrusted CAs, and handshake failures.
+- 📜 **Trusted CA roots:** CA certificates are bundled into the exporter image so HTTPS probes trust roots such as Let's Encrypt / ISRG Root X1.
+- ✨ **UI cleanup:** The app version moved from the footer to the header next to the KubePing logo. Header and footer dividers and bold target-heading styling were removed.
+- 🐳 **Docker Hub namespace:** Web and exporter images are now published as `kubeping/kubeping-web` and `kubeping/kubeping-exporter` instead of under the per-user `github.repository` namespace.
+- 🛠️ **Release workflow:** Fixed `APP_VERSION` updates in `config.py` by matching its actual file format.
+- ✅ **Test coverage:** Added unit tests for the TCP, HTTP, and ICMP probe modules and the `/probe` HTTP handler.

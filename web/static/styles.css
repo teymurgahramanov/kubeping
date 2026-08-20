@@ -57,9 +57,8 @@ body {
 /* Top bar */
 .topbar {
   background: var(--topbar-bg);
-  border-bottom: 1px solid var(--border);
   padding: 0.5rem 1.5rem;
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s;
 }
 
 .topbar-inner {
@@ -103,6 +102,15 @@ body {
 
 .logo-ping {
   color: var(--text-dim);
+}
+
+.app-version {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  opacity: 0.6;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .ip-value {
@@ -187,6 +195,7 @@ body {
 
 .form-group.address { flex: 1; }
 .form-group.timeout { width: 110px; }
+.form-group.module { width: 120px; }
 
 label {
   font-size: 0.85rem;
@@ -217,6 +226,30 @@ input:focus {
 input::placeholder {
   color: var(--text-dim);
   opacity: 0.6;
+}
+
+select {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  background: var(--input-bg);
+  color: var(--text);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: calc(100% - 1.1rem) calc(50% - 0.1rem), calc(100% - 0.7rem) calc(50% - 0.1rem);
+  background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+  background-repeat: no-repeat;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 button[type="submit"] {
@@ -254,13 +287,23 @@ button[type="submit"].loading .btn-loading {
   max-width: 720px;
 }
 
-.results-section h2 {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.75rem;
+.results-target {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  margin-bottom: 0.9rem;
+  word-break: break-all;
+}
+
+.results-target-address {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 400;
 }
 
 .results-table {
@@ -345,8 +388,6 @@ button[type="submit"].loading .btn-loading {
   padding: 1.5rem;
   font-size: 0.8rem;
   color: var(--text-dim);
-  border-top: 1px solid var(--border);
-  transition: border-color 0.3s;
 }
 
 .footer a {
@@ -378,6 +419,10 @@ button[type="submit"].loading .btn-loading {
   }
 
   .form-group.timeout {
+    width: 100%;
+  }
+
+  .form-group.module {
     width: 100%;
   }
 

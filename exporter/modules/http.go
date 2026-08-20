@@ -7,10 +7,11 @@ import (
 	"time"
 )
 
-// ProbeHTTP is for probe HTTP endpoints
-func ProbeHTTP(address string, timeout int) (bool, error) {
+// ProbeHTTP is for probe HTTP endpoints. When insecureTLS is true the
+// server's certificate is not verified.
+func ProbeHTTP(address string, timeout int, insecureTLS bool) (bool, error) {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureTLS},
 	}
 	client := &http.Client{
 		Transport: tr,

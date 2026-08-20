@@ -1,6 +1,6 @@
 module github.com/teymurgahramanov/KubePing/exporter
 
-go 1.21.6
+go 1.27.0
 
 require (
 	github.com/prometheus-community/pro-bing v0.3.0

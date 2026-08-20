@@ -3,3 +3,4 @@ __pycache__/
 values-dev.yaml
 bin/
 config.yaml
+.DS_Store

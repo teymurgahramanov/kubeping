@@ -14,6 +14,7 @@ label_selector = "kubeping/component=exporter"
 exporter_probe_path = '/probe'
 app_version = config.APP_VERSION
 public_ip_url = config.PUBLIC_IP_URL
+supported_modules = ("tcp", "http", "icmp")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get(
@@ -37,17 +38,28 @@ def healthz():
 def index():
     public_ip = get_public_ip()
     results = session.pop('results', None)
-    return render_template('index.html', version=app_version, public_ip=public_ip, results=results)
+    target = session.pop('target', None)
+    module = session.pop('module', None)
+    return render_template('index.html', version=app_version, public_ip=public_ip, results=results, target=target, module=module, modules=supported_modules)
 
 @app.route('/ping', methods=['POST'])
 def ping():
+    module = request.form.get('module', 'tcp')
+    address = request.form['address']
+    timeout = int(request.form['timeout'])
+
+    if module not in supported_modules:
+        module = 'tcp'
+
     data = {
-        "module": "tcp",
-        "address": request.form['address'],
-        "timeout": int(request.form['timeout'])
+        "module": module,
+        "address": address,
+        "timeout": timeout
     }
     exporters = {}
     session['results'] = []
+    session['target'] = address
+    session['module'] = module
     pods = v1.list_namespaced_pod(namespace=current_namespace, label_selector=label_selector)
     
     if not pods.items:

@@ -9,7 +9,7 @@ on:
         required: true
 
 env:
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_REPO: kubeping
   HELM_REPO_NAME: charts
   HELM_REPO_OWNER: ${{ secrets.HELM_REPO_OWNER }}
   HELM_REPO_TOKEN: ${{ secrets.HELM_REPO_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
           CHART_FILE="helm/Chart.yaml"
 
           echo "Updating $CONFIG_FILE with APP_VERSION=$APP_VERSION"
-          sed -i "s/^    APP_VERSION: str = \".*\"/    APP_VERSION: str = \"$APP_VERSION\"/" $CONFIG_FILE
+          sed -i "s/^    APP_VERSION = '.*'/    APP_VERSION = '$APP_VERSION'/" $CONFIG_FILE
           
           echo "Updating $CHART_FILE with appVersion=$APP_VERSION"
           sed -i "s/^appVersion:.*/appVersion: \"$APP_VERSION\"/" $CHART_FILE
@@ -60,7 +60,7 @@ jobs:
           context: ./web
           file: ./web/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}-web:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_NAME }}-web:latest
+          tags: ${{ env.IMAGE_REPO }}/kubeping-web:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}/kubeping-web:latest
 
       - name: Build and push Exporter image
         uses: docker/build-push-action@v5
@@ -68,7 +68,7 @@ jobs:
           context: ./exporter
           file: ./exporter/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}-exporter:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_NAME }}-exporter:latest
+          tags: ${{ env.IMAGE_REPO }}/kubeping-exporter:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}/kubeping-exporter:latest
 
       - name: Set up Helm
         uses: azure/setup-helm@v3

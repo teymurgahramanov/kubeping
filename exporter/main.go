@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -21,10 +20,11 @@ type configuration struct {
 }
 
 type targetConfig struct {
-	Address  string `yaml:"address"`
-	Module   string `yaml:"module"`
-	Interval int    `yaml:"interval"`
-	Timeout  int    `yaml:"timeout"`
+	Address     string `yaml:"address"`
+	Module      string `yaml:"module"`
+	Interval    int    `yaml:"interval"`
+	Timeout     int    `yaml:"timeout"`
+	InsecureTLS bool   `yaml:"insecureTls"`
 }
 
 type exporterConfig struct {
@@ -34,9 +34,10 @@ type exporterConfig struct {
 }
 
 type probeRequest struct {
-	Module  string `json:"module"`
-	Address string `json:"address"`
-	Timeout int    `json:"timeout"`
+	Module      string `json:"module"`
+	Address     string `json:"address"`
+	Timeout     int    `json:"timeout"`
+	InsecureTLS bool   `json:"insecureTls"`
 }
 
 type probeResponse struct {
@@ -102,58 +103,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.HandlerFor(promRegistry, promhttp.HandlerOpts{}))
-	mux.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-			return
-		}
-
-		var request probeRequest
-		err := json.NewDecoder(r.Body).Decode(&request)
-		if err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
-			return
-		}
-
-		timeout := request.Timeout
-		if timeout == 0 {
-			timeout = config.Exporter.DefaultProbeTimeout
-		}
-
-		resultHandler := func(result bool, probeErr error) {
-			var response probeResponse
-			response.Result = false
-			if result {
-				logger.Info("Probe successful")
-				response.Result = true
-			} else {
-				if probeErr != nil {
-					logger.Error("probe failed", slog.String("err", probeErr.Error()))
-					response.Error = probeErr.Error()
-				} else {
-					response.Error = "probe failed"
-				}
-			}
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
-		}
-
-		switch request.Module {
-		case "tcp":
-			result, err := modules.ProbeTCP(request.Address, timeout)
-			resultHandler(result, err)
-		case "http":
-			result, err := modules.ProbeHTTP(request.Address, timeout)
-			resultHandler(result, err)
-		case "icmp":
-			result, err := modules.ProbeICMP(request.Address, timeout)
-			resultHandler(result, err)
-		default:
-			logger.Error("Unknown module")
-			http.Error(w, "Unknown module", http.StatusBadRequest)
-			return
-		}
-	})
+	mux.HandleFunc("/probe", handleProbe(logger, config.Exporter.DefaultProbeTimeout))
 
 	// Start HTTP server
 	go func() {
@@ -175,7 +125,7 @@ func main() {
 	// Start probes if any targets are defined
 	for key, value := range config.Targets {
 		wg.Add(1)
-		go func(target string, module string, address string, interval int, timeout int) {
+		go func(target string, module string, address string, interval int, timeout int, insecureTLS bool) {
 			defer wg.Done()
 			if interval == 0 {
 				interval = config.Exporter.DefaultProbeInterval
@@ -204,7 +154,7 @@ func main() {
 				}
 			case "http":
 				for {
-					result, err := modules.ProbeHTTP(address, timeout)
+					result, err := modules.ProbeHTTP(address, timeout, insecureTLS)
 					resultHandler(result, err, interval)
 				}
 			case "icmp":
@@ -215,7 +165,7 @@ func main() {
 			default:
 				targetLogger.Error("Unknown module")
 			}
-		}(key, value.Module, value.Address, value.Interval, value.Timeout)
+		}(key, value.Module, value.Address, value.Interval, value.Timeout, value.InsecureTLS)
 	}
 
 	wg.Wait()
