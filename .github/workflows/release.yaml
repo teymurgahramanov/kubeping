@@ -9,7 +9,7 @@ on:
         required: true
 
 env:
-  IMAGE_REPO: kubeping
+  IMAGE_REPO: teymurgahramanov/kubeping
   HELM_REPO_NAME: charts
   HELM_REPO_OWNER: ${{ secrets.HELM_REPO_OWNER }}
   HELM_REPO_TOKEN: ${{ secrets.HELM_REPO_TOKEN }}
@@ -60,7 +60,7 @@ jobs:
           context: ./web
           file: ./web/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_REPO }}/kubeping-web:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}/kubeping-web:latest
+          tags: ${{ env.IMAGE_REPO }}:web-${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}:web-latest
 
       - name: Build and push Exporter image
         uses: docker/build-push-action@v5
@@ -68,7 +68,7 @@ jobs:
           context: ./exporter
           file: ./exporter/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_REPO }}/kubeping-exporter:${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}/kubeping-exporter:latest
+          tags: ${{ env.IMAGE_REPO }}:exporter-${{ env.RELEASE_NAME }}, ${{ env.IMAGE_REPO }}:exporter-latest
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
