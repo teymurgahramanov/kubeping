@@ -306,6 +306,46 @@ button[type="submit"].loading .btn-loading {
   font-weight: 400;
 }
 
+/* Copy control in table header */
+.results-table .col-copy {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.results-table .col-copy-cell {
+  width: 1%;
+  padding: 0;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.copy-btn:hover {
+  background: var(--table-row-hover);
+  color: var(--text);
+}
+
+.copy-btn.copied {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.copy-btn .copy-done-icon { display: none; }
+.copy-btn.copied .copy-icon { display: none; }
+.copy-btn.copied .copy-done-icon { display: inline; }
+
 .results-table {
   width: 100%;
   border-collapse: separate;

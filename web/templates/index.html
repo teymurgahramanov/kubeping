@@ -33,7 +33,7 @@
             <form action="/ping" method="post" id="pingForm">
                 <div class="form-row">
                     <div class="form-group module">
-                        <label for="module">Module</label>
+                        <label for="module">Method</label>
                         <select id="module" name="module">
                             {% for m in modules %}
                             <option value="{{ m }}" {% if module == m %}selected{% endif %}>{{ m|upper }}</option>
@@ -68,12 +68,18 @@
                 <span class="results-target-address">{{ target }}</span>
             </h2>
             {% endif %}
-            <table class="results-table">
+            <table class="results-table" id="resultsTable">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Host</th>
+                        <th>Source</th>
                         <th>Result</th>
+                        <th class="col-copy">
+                            <button type="button" class="copy-btn" id="copyBtn" aria-label="Copy results" title="Copy table">
+                                <svg class="copy-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <svg class="copy-done-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,6 +94,7 @@
                                 <span class="badge error">{{ result.result }}</span>
                             {% endif %}
                         </td>
+                        <td class="col-copy-cell"></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -111,7 +118,7 @@
             const placeholders = {
                 tcp: 'host:port',
                 http: 'http(s)://host[:port][/path]',
-                icmp: 'host or IP'
+                icmp: 'host'
             };
             const moduleSelect = document.getElementById('module');
             const addressInput = document.getElementById('address');
@@ -120,6 +127,46 @@
             };
             updatePlaceholder();
             moduleSelect.addEventListener('change', updatePlaceholder);
+        })();
+
+        (function () {
+            const btn = document.getElementById('copyBtn');
+            if (!btn) return;
+            btn.addEventListener('click', async function () {
+                const table = document.getElementById('resultsTable');
+                if (!table) return;
+
+                const clone = table.cloneNode(true);
+                clone.querySelectorAll('.col-copy, .col-copy-cell').forEach(el => el.remove());
+
+                const html = clone.outerHTML;
+                const rows = [];
+                for (const tr of clone.querySelectorAll('tr')) {
+                    const cells = [...tr.querySelectorAll('th,td')].map(c => c.textContent.trim());
+                    rows.push(cells.join('\t'));
+                }
+                const text = rows.join('\n');
+
+                if (navigator.clipboard && window.ClipboardItem) {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({
+                                'text/html': new Blob([html], { type: 'text/html' }),
+                                'text/plain': new Blob([text], { type: 'text/plain' })
+                            })
+                        ]);
+                    } catch {}
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 1500);
+            });
         })();
 
         (function () {
